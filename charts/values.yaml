@@ -5,7 +5,7 @@
 replicaCount: 1
 deployment:
   datasource:
-    db_host: "34.159.75.23"
+    db_host: '34.159.75.23'
     db_port: 5432
     db_name: petclinicdb
     #jdbc_url: jdbc:postgresql://postgresql:5432/mydb
