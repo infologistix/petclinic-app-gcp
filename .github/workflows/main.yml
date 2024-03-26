@@ -34,14 +34,20 @@ jobs:
         chmod +x mvnw
         ./mvnw -B package --update-snapshots verify
 
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: docker login
-      env:
+   # - name: docker login
+   #   env:
         #DOCKER_USER: ${{ secrets.DOCKER_USER }}   
-        DOCKER_PASSWORD: $PAT # ${{ secrets.DOCKER_PASSWORD }}
+   #     DOCKER_PASSWORD: $PAT # ${{ secrets.DOCKER_PASSWORD }}
       ## run command use for running linux command  
-      run: |
-        docker login ${{env.REGISTRY}} -u $DOCKER_USER -p $DOCKER_PASSWORD
+   #   run: |
+   #     docker login ${{env.REGISTRY}} -u $DOCKER_USER -p $DOCKER_PASSWORD
         
     - name: docker build quarkus-petclinic-jvm
       run: |
