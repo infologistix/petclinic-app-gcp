@@ -1,0 +1,73 @@
+name: Deleting Postgres Server
+
+#on: workflow_dispatch
+on: delete
+
+jobs:
+  Update_fleet_repo:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: ${{ github.event.ref }}
+      
+    steps:
+    - name: Set the environment variable
+      run: |
+        echo BRANCH=${{ github.event.ref }} >> $GITHUB_ENV
+      
+    - name: Checkout
+      run: |
+        eval `ssh-agent -s`
+        ssh-add - <<< '${{ secrets.PRIVATE_SSH_KEY_FLEET }}'
+        git clone git@github.com:infologistix/petclinic-fleet.git
+        ls
+
+    - name: Remove Branch and Commit Changes for Fleet repo
+      run: |
+        cd petclinic-fleet
+        eval "$(ssh-agent -s)"
+        ssh-add - <<< '${{ secrets.PRIVATE_SSH_KEY_FLEET }}'
+        RandomID=$(cksum <<< ${GITHUB_REF##*/} | cut -f 1 -d ' ')
+        echo "$RandomID github-actions[bot] pushes to Branch ${BRANCH}" 
+        git config --local user.email "$RandomID+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git rm -r $BRANCH
+        git commit -m "branch ${GITHUB_REF##*/} removed"
+        git push
+
+
+  Remove_Server:
+    runs-on: ubuntu-latest
+    
+    env:
+      BRANCH: ${{ github.event.ref }}
+      
+    steps:
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Delete Server
+      run: |
+        bash actions/delete_db.sh
+
+  Remove_Namespace:
+    runs-on: ubuntu-latest
+    needs: [Update_fleet_repo]
+    
+    steps:
+    - name: Get Kubectl
+      uses: tale/kubectl-action@v1
+      with:
+        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+    - name: Delete Namespace
+      run: |
+          NAMESPACE=$(echo ${{ github.event.ref }} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
+          if kubectl get namespace $NAMESPACE &> /dev/null; then 
+            kubectl delete namespace $NAMESPACE
+          else 
+            echo "Namespace does not exist" 
+          fi
