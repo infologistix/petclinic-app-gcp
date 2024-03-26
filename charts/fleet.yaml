@@ -1,6 +1,6 @@
 defaultNamespace: main
 helm:
-  repo: git@github.com:infologistix/petclinic-app.git
+  repo: https://github.com/infologistix/petclinic-app-gcp.git
   releaseName: petclinic-main
   valuesFiles:
     - charts/values.yaml
