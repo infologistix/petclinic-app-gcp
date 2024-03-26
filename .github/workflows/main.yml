@@ -37,8 +37,8 @@ jobs:
 
     - name: docker login
       env:
-        DOCKER_USER: ${{ secrets.DOCKER_USER }}   
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        #DOCKER_USER: ${{ secrets.DOCKER_USER }}   
+        DOCKER_PASSWORD: $PAT # ${{ secrets.DOCKER_PASSWORD }}
       ## run command use for running linux command  
       run: |
         docker login ${{env.REGISTRY}} -u $DOCKER_USER -p $DOCKER_PASSWORD
