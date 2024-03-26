@@ -7,14 +7,14 @@ metadata:
 spec:
   exportTo:
   - .
-  # hosts:
-  # {{- if .Values.debug.no_db }}
-  # - "sample-database.azure.com"
-  # {{- else }}
-  # - "example.com" #{{ .Values.deployment.datasource.db_host }}
-  # {{- end }}
+  hosts:
+  {{- if .Values.debug.no_db }}
+  - "sample-database.azure.com"
+  {{- else }}
+  - "example.com" #{{ .Values.deployment.datasource.db_host }}
+  {{- end }}
   addresses:
-  - 34.159.75.23
+  - 34.159.75.23/32
   location: MESH_EXTERNAL
   ports:
   - name: jdbc
