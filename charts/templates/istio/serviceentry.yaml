@@ -10,8 +10,8 @@ spec:
   hosts:
   {{- if .Values.debug.no_db }}
   - "sample-database.azure.com"
-  #{{- else }}
-  #- {{ .Values.deployment.datasource.db_host }}
+  {{- else }}
+  - {{ .Values.deployment.datasource.db_host }}
   {{- end }}
   addresses:
   - {{ .Values.deployment.datasource.db_host }}/32
