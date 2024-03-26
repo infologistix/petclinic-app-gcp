@@ -1,0 +1,58 @@
+# Default values for petclinic.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+deployment:
+  datasource:
+    db_host: pg-server-3245870997.postgres.database.azure.com
+    db_port: 5432
+    db_name: postgres
+    #jdbc_url: jdbc:postgresql://postgresql:5432/mydb
+    username: username
+    password: password
+  image:
+    repository: lbankinfologistix.azurecr.io/quarkus-petclinic-jvm
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    #tag: "1.0.0"
+    tag: "latest"
+imagePullSecrets: registry
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+podAnnotations: {}
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+# capabilities:
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+ingress:
+  host: k8s-downstream.ddnss.de # to be defined 
+  path: # -> Hier bitte einen neuen Pfad eintragen, unter der das neue Deployment erreichbar sein soll...
+  enabled: true
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+debug:
+  no_db: false

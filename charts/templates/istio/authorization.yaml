@@ -1,0 +1,17 @@
+{{ if .Values.ingress.enabled }}
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+ name: allow-all
+ namespace: {{ .Release.Namespace }}
+spec:
+ rules:
+ - from:
+    - source:
+        principals:
+        - cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+        - cluster.local/ns/cattle-monitoring-system/sa/rancher-monitoring-prometheus
+spec:
+ rules:
+ - {}
+{{ end }}

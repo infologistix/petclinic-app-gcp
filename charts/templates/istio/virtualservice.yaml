@@ -1,0 +1,23 @@
+{{ if .Values.ingress.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "petclinic.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  gateways:
+  - istio-system/istio-ingress-gateway
+  hosts:
+  - "petclinic-{{ .Release.Namespace }}.{{ .Values.ingress.host }}"
+  http:
+  - match:  
+    - uri:
+        prefix: /
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: {{ include "petclinic.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: 8080 
+{{ end }}

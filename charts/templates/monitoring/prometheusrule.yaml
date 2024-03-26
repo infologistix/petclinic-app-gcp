@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "petclinic.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    tbd: tbd
+spec:
+  groups:
+  - name: petclinic-alerts
+    rules:
+      - alert: CrashLoopBackOff 
+        annotations:
+          message: petclinic is crashing
+        expr: up{service='petclinic', namespace='{{ .Release.Namespace }}'} == 0
+        for: 2m
+        labels:
+          app: petclinic
+          namespace: {{ .Release.Namespace }}
