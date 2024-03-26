@@ -11,7 +11,7 @@ jobs:
     env:
 
       TAG: petclinic
-      PAT: ${{ secrets.GITHUB_TOKEN }}
+      PAT: ${{ secrets.PAT }}
       USER: infologistix
       DOCKER_USER: palexus
       REGISTRY: ghcr.io
