@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: push
 
 on: push
   #push:
@@ -49,19 +49,23 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       ## run command use for running linux command  
       run: |
-        docker login lbankinfologistix.azurecr.io -u $DOCKER_USER -p $DOCKER_PASSWORD
+        docker login ghcr.io -u $DOCKER_USER -p $DOCKER_PASSWORD
         
     - name: docker build quarkus-petclinic-jvm
       run: |
-        docker build --no-cache -f src/main/docker/Dockerfile.jvm -t ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }} .
+        docker build --no-cache -f src/main/docker/Dockerfile.jvm -t test .
         
     - name: Scan Image
       uses: neuvector/scan-action@main
       with:
-        image-repository: ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }}
+        image-repository: test
         image-tag: latest
         min-high-cves-to-fail: "52"
         min-medium-cves-to-fail: "100"
+
+    - name: Tag image
+      run: |
+        docker tag test ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }}
         
     - name: docker push
       run: |
