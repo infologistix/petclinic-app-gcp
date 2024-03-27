@@ -97,5 +97,5 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         branch: ${{ github.ref }}<
-        repository: infologistix/petclinic-app
+        repository: infologistix/petclinic-app-gcp
 
