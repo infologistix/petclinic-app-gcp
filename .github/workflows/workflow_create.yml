@@ -1,29 +1,33 @@
 name: Create Branch Workflow
 
-#on: workflow_dispatch
-on: create
+on: workflow_dispatch
+#on: create
 
 jobs:
 
-  build-and-deploy-on-Azure:
-    runs-on: ubuntu-latest
+ # build-and-deploy-on-Azure:
+ #   runs-on: ubuntu-latest
     
-    steps:
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+ #   steps:
+ #   - name: Azure Login
+ #     uses: azure/login@v1
+ #     with:
+ #       creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Checkout
-      uses: actions/checkout@v1
+ #   - name: Checkout
+ #     uses: actions/checkout@v1
 
-    - name: Create Postgres Server
-      run: |
-        bash actions/create_db.sh
+  #  - name: Create Postgres Server
+  #    run: |
+  #      bash actions/create_db.sh
 
 
   create-namespace:
     runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: p-cvjff
+      CLUSTER_ID: c-zkg5f
     
     steps:
     - name: Get Kubectl
@@ -39,8 +43,8 @@ jobs:
           else 
             kubectl create namespace $NAMESPACE
             kubectl label namespaces $NAMESPACE istio-injection=enabled --overwrite=true
-            kubectl label namespaces $NAMESPACE field.cattle.io/projectId=p-7m4t9 --overwrite=true
-            kubectl annotate namespaces $NAMESPACE field.cattle.io/projectId=c-6pcxg:p-7m4t9
+            kubectl label namespaces $NAMESPACE field.cattle.io/projectId=${{ env.PROJECT_ID }} --overwrite=true
+            kubectl annotate namespaces $NAMESPACE field.cattle.io/projectId=${{ env.CLUSTER_ID }}:${{ env.PROJECT_ID }}
           fi
           
   checkout-update-app:
@@ -57,20 +61,24 @@ jobs:
       with:
         ssh-key: ${{ secrets.SSH_PRIVATE_KEY_APP }}
         persist-credentials: true
-        repository: infologistix/petclinic-app
+        repository: infologistix/petclinic-app-gcp
+
+    - uses: 'google-github-actions/auth@v2'
+      with:
+        project_id: 'my-project'
+        credentials_json: ${{ secrets.GCLOUD_JSON }}
 
     - name: Update Helm Repo for App
       run: |
         touch test.txt     # This and the next line is for text to avoid nothing to commit error
         echo "another boring line" >> test.txt
         echo "You are on the Branch ${GITHUB_REF##*/}"
-        RandomID=$(cksum <<< ${GITHUB_REF##*/} | cut -f 1 -d ' ')
-        export server=pg-server-$RandomID.postgres.database.azure.com
+        export HOST=$(gcloud sql instances describe postgres-feature | grep ipAddress | tail -1 | awk '{print $NF}')
         export NAMESPACE=$(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
         export RELEASENAME=petclinic-${GITHUB_REF##*/}
         echo "The host of the DB is pg-server-$RandomID"
         echo "The namespace in fleet.yaml is $NAMESPACE"
-        yq -i eval '.deployment.datasource.db_host=env(server)' charts/values.yaml
+        yq -i eval '.deployment.datasource.db_host=env(HOST)' charts/values.yaml
         yq -i eval '.defaultNamespace=env(NAMESPACE)' charts/fleet.yaml
         yq -i eval '.namespace=env(NAMESPACE)' charts/fleet.yaml
         yq -i eval '.helm.releaseName=env(RELEASENAME)' charts/fleet.yaml
@@ -88,61 +96,6 @@ jobs:
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
-        branch: ${{ github.ref }}
+        branch: ${{ github.ref }}<
         repository: infologistix/petclinic-app
 
-
-  checkout-update-fleet-repo:
-    runs-on: ubuntu-latest
-    needs: [checkout-update-app, build-and-deploy-on-Azure]
-    env:
-      BRANCH: ${GITHUB_REF##*/}
-      NAME: fleet-job-${GITHUB_REF##*/}
-      RELEASENAME: petclinic-${GITHUB_REF##*/}
-
-    steps:
-    - name: Set the environment variable
-      run: |
-        echo BRANCH=${GITHUB_REF##*/} >> $GITHUB_ENV
-        echo NAME=fleet-job-${GITHUB_REF##*/} >> $GITHUB_ENV
-        echo RELEASENAME=fleet-${GITHUB_REF##*/}>> $GITHUB_ENV
-        
-    - name: Checkout
-      run: |
-        eval `ssh-agent -s`
-        ssh-add - <<< '${{ secrets.PRIVATE_SSH_KEY_FLEET }}'
-        git clone git@github.com:infologistix/petclinic-fleet.git
-        ls
-
-    - name: install yq
-      run: |
-        sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-        sudo chmod +x /usr/bin/yq
-        yq --version
-
-    - name: Overwrite values
-      run: |
-        cd petclinic-fleet
-        mkdir $BRANCH
-        cp -r main/* $BRANCH
-        cd $BRANCH
-        yq -i '.name=strenv(NAME)' values.yml
-        yq -i '.branch=strenv(BRANCH)' values.yml
-        yq -i '.helm.releaseName=strenv(RELEASENAME)' fleet.yaml
-        yq -i '.helm.values.name=strenv(NAME)' fleet.yaml
-        yq -i '.helm.values.branch=strenv(BRANCH)' fleet.yaml
-
-    - name: Commit Changes for Fleet
-      run: |
-        cd petclinic-fleet
-        touch test.txt     # This and the next line is for text to avoid nothing to commit error
-        echo "another boring line" >> test.txt
-        eval "$(ssh-agent -s)"
-        ssh-add - <<< '${{ secrets.PRIVATE_SSH_KEY_FLEET }}'
-        RandomID=$(cksum <<< ${GITHUB_REF##*/} | cut -f 1 -d ' ')
-        echo "$RandomID github-actions[bot] pushes to Branch ${BRANCH}" 
-        git config --local user.email "$RandomID+github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add *
-        git commit -m "values for branch ${GITHUB_REF##*/} updated"
-        git push
