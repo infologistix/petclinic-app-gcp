@@ -49,7 +49,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       ## run command use for running linux command  
       run: |
-        docker login ghcr.io -u $DOCKER_USER -p $DOCKER_PASSWORD
+        echo $DOCKER_PASSWORD | docker login ghcr.io -u $DOCKER_USER --password-stdin
         
     - name: docker build quarkus-petclinic-jvm
       run: |
