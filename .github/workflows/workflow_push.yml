@@ -17,10 +17,20 @@ on: push
 jobs:
   build:
 
+    env:
+      TAG: petclinic
+      PAT: ${{ secrets.PAT }}
+      USER: infologistix
+      DOCKER_USER: palexus
+      REGISTRY: ghcr.io
+      VERSION: $(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
+
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -43,16 +53,16 @@ jobs:
         
     - name: docker build quarkus-petclinic-jvm
       run: |
-        docker build --no-cache -f src/main/docker/Dockerfile.jvm -t lbankinfologistix.azurecr.io/quarkus-petclinic-jvm:latest .
+        docker build --no-cache -f src/main/docker/Dockerfile.jvm -t ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }} .
         
     - name: Scan Image
       uses: neuvector/scan-action@main
       with:
-        image-repository: lbankinfologistix.azurecr.io/quarkus-petclinic-jvm
+        image-repository: ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }}
         image-tag: latest
         min-high-cves-to-fail: "52"
         min-medium-cves-to-fail: "100"
         
     - name: docker push
       run: |
-        docker push lbankinfologistix.azurecr.io/quarkus-petclinic-jvm:latest
+        docker push ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }}
