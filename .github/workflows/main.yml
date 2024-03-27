@@ -15,7 +15,7 @@ jobs:
       USER: infologistix
       DOCKER_USER: palexus
       REGISTRY: ghcr.io
-      VERSION: dev
+      VERSION: main
  
     steps:
 
