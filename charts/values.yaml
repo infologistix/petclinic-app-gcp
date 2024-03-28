@@ -8,7 +8,7 @@ deployment:
     db_host: 10.247.80.3
     db_port: 5432
     db_name: postgres
-    jdbc_url: jdbc:postgresql://34.159.75.23:5432/postgres
+    jdbc_url: jdbc:postgresql://10.247.80.3:5432/postgres
     #jdbc_url: jdbc:postgresql://postgresql:5432/mydb
     username: postgres
     password: password123
