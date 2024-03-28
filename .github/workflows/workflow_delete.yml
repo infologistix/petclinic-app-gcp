@@ -50,14 +50,14 @@ jobs:
 
     - uses: 'google-github-actions/auth@v2'
       with:
-        project_id: ${{ secrets.PROJECT_ID }}
+        project_id: ${{ secrets.PROJECTS_ID }}
         credentials_json: ${{ secrets.GCLOUD_JSON }}
 
     - name: Delete Server
       run: |
         export NAME=postgres-$BRANCH
         gcloud sql instances delete $NAME \
-          --project=${{ secrets.PROJECT_ID }}
+          --project=${{ secrets.PROJECTS_ID }}
 
 
   Remove_Namespace:
