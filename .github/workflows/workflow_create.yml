@@ -133,7 +133,7 @@ jobs:
 
     - name: Overwrite values
       run: |
-        cd petclinic-fleet
+        cd petclinic-fleet-gcp
         mkdir -p $BRANCH
         cp -r main/* $BRANCH
         cd $BRANCH
@@ -145,7 +145,7 @@ jobs:
 
     - name: Commit Changes for Fleet
       run: |
-        cd petclinic-fleet
+        cd petclinic-fleet-gcp
         touch test.txt     # This and the next line is for text to avoid nothing to commit error
         echo "another boring line" >> test.txt
         eval "$(ssh-agent -s)"
@@ -154,7 +154,7 @@ jobs:
         echo "$RandomID github-actions[bot] pushes to Branch ${BRANCH}" 
         git config --local user.email "$RandomID+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add *
+        git add $BRANCH
         git commit -m "values for branch ${GITHUB_REF##*/} updated"
         git push
 
