@@ -93,7 +93,7 @@ jobs:
       run: |
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add charts/values.yaml charts/fleet.yaml
+        git add charts/values.yaml charts/fleet.yaml test.txt
         git commit -m "values in chart for ${GITHUB_REF##*/} updated"
         
     - name: Push changes
@@ -154,7 +154,7 @@ jobs:
         echo "$RandomID github-actions[bot] pushes to Branch ${BRANCH}" 
         git config --local user.email "$RandomID+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add $BRANCH
+        git add $BRANCH test.txt
         git commit -m "values for branch ${GITHUB_REF##*/} updated"
         git push
 
