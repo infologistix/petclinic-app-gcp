@@ -26,12 +26,12 @@ jobs:
         cd petclinic-fleet-gcp
         eval "$(ssh-agent -s)"
         ssh-add - <<< '${{ secrets.SSH_PRIVATE_KEY_FLEET }}'
-        RandomID=$(cksum <<< ${GITHUB_REF##*/} | cut -f 1 -d ' ')
+        RandomID=$(cksum <<< ${{ github.event.ref }} | cut -f 1 -d ' ')
         echo "$RandomID github-actions[bot] pushes to Branch ${BRANCH}" 
         git config --local user.email "$RandomID+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git rm -r $BRANCH
-        git commit -m "branch ${GITHUB_REF##*/} removed"
+        git commit -m "branch ${{ github.event.ref }} removed"
         git push
 
 
@@ -57,7 +57,7 @@ jobs:
       run: |
         export NAME=postgres-$BRANCH
         gcloud sql instances delete $NAME \
-          --project=$PROJECTS_ID
+          --project=${{ secrets.PROJECT_ID }}
 
 
   Remove_Namespace:
