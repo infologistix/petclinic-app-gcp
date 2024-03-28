@@ -1,4 +1,4 @@
-defaultNamespace: petclinic
+defaultNamespace: main
 helm:
   repo: https://github.com/infologistix/petclinic-app-gcp.git
   releaseName: petclinic-main
@@ -8,4 +8,4 @@ helm:
 # All resources will be assigned to this namespace and if any cluster scoped
 # resource exists the deployment will fail.
 # Default: ""
-namespace: petclinic
+namespace: main
