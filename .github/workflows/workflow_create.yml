@@ -44,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PROJECT_ID: p-cvjff
-      CLUSTER_ID: c-zkg5f
+      PROJECT_ID: p-f2k99
+      CLUSTER_ID: c-62tds
     
     steps:
     - name: Get Kubectl
