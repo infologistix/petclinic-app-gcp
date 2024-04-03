@@ -1,0 +1,13 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: petclinic
+  namespace: fleet-default
+spec:
+  branch: main
+  insecureSkipTLSVerify: false
+  paths:
+    - charts
+  repo: https://github.com/infologistix/petclinic-app-gcp.git
+  targets:
+    - clusterName: c-zkg5f
