@@ -64,6 +64,16 @@ jobs:
             kubectl label namespaces $NAMESPACE field.cattle.io/projectId=${{ env.PROJECT_ID }} --overwrite=true
             kubectl annotate namespaces $NAMESPACE field.cattle.io/projectId=${{ env.CLUSTER_ID }}:${{ env.PROJECT_ID }}
           fi
+          cat <<'YAML' | kubectl apply -f -
+          apiVersion: v1
+          data:
+            .dockerconfigjson: ${{ secrets.REGISTRYSECRET }}
+          kind: Secret
+          metadata:
+            name: registry
+            namespace: $NAMESPACE
+          type: kubernetes.io/dockerconfigjson
+          YAML
 
           
   checkout-update-app:
