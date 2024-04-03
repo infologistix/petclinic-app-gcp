@@ -81,7 +81,7 @@ jobs:
           
   checkout-update-app:
     runs-on: ubuntu-latest
-    needs: [create-namespace]
+    needs: [create-namespace, build-and-deploy-on-google]
     steps:
     - name: install yq
       run: |
@@ -105,7 +105,6 @@ jobs:
         touch test.txt     # This and the next line is for text to avoid nothing to commit error
         echo "another boring line" >> test.txt
         echo "You are on the Branch ${GITHUB_REF##*/}"
-        # gcloud config set project ${{ secrets.PROJECT_ID }}
         export BRANCH=${GITHUB_REF##*/}
         export HOST=$(gcloud sql instances describe postgres-$BRANCH | grep ipAddress | tail -1 | awk '{print $NF}')
         echo the host is $HOST
