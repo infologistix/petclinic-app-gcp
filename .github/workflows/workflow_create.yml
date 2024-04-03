@@ -53,16 +53,19 @@ jobs:
       with:
         base64-kube-config: ${{ secrets.KUBE_CONFIG }}
         
+    - name: Set the environment variable
+      run: |
+        echo NAMESPACE=$(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g') >> $GITHUB_ENV
+        
     - name: Create Namespace
       run: |
-          NAMESPACE=$(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
-          if kubectl get namespace $NAMESPACE &> /dev/null; then 
+          if kubectl get namespace ${{ env.NAMESPACE }} &> /dev/null; then 
             echo "Namespace already exists" 
           else 
-            kubectl create namespace $NAMESPACE
-            kubectl label namespaces $NAMESPACE istio-injection=enabled --overwrite=true
-            kubectl label namespaces $NAMESPACE field.cattle.io/projectId=${{ env.PROJECT_ID }} --overwrite=true
-            kubectl annotate namespaces $NAMESPACE field.cattle.io/projectId=${{ env.CLUSTER_ID }}:${{ env.PROJECT_ID }}
+            kubectl create namespace ${{ env.NAMESPACE }}
+            kubectl label namespaces ${{ env.NAMESPACE }} istio-injection=enabled --overwrite=true
+            kubectl label namespaces ${{ env.NAMESPACE }} field.cattle.io/projectId=${{ env.PROJECT_ID }} --overwrite=true
+            kubectl annotate namespaces ${{ env.NAMESPACE }} field.cattle.io/projectId=${{ env.CLUSTER_ID }}:${{ env.PROJECT_ID }}
           fi
           cat <<'YAML' | kubectl apply -f -
           apiVersion: v1
@@ -71,7 +74,7 @@ jobs:
           kind: Secret
           metadata:
             name: registry
-            namespace: $NAMESPACE
+            namespace: ${{ env.NAMESPACE }}
           type: kubernetes.io/dockerconfigjson
           YAML
 
