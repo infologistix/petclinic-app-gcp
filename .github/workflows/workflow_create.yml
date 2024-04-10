@@ -8,7 +8,7 @@ jobs:
   build-and-deploy-on-google:
     runs-on: ubuntu-latest
     env:
-     REGION: europe-west3
+      REGION: europe-west3
       TIER: db-f1-micro
     
     steps:
@@ -18,10 +18,10 @@ jobs:
         persist-credentials: true
         repository: infologistix/petclinic-app-gcp
 
-  #   - uses: 'google-github-actions/auth@v2'
-  #     with:
-  #       project_id: ${{ secrets.PROJECT_ID }}
-  #       credentials_json: ${{ secrets.GCLOUD_JSON }}
+    - uses: 'google-github-actions/auth@v2'
+      with:
+        project_id: ${{ secrets.PROJECT_ID }}
+        credentials_json: ${{ secrets.GCLOUD_JSON }}
 
   #   - name: Create Postgres Server
   #     run: |
