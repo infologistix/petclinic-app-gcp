@@ -5,39 +5,39 @@ on: workflow_dispatch
 
 jobs:
 
-  build-and-deploy-on-google:
-    runs-on: ubuntu-latest
-    env:
-      REGION: europe-west3
-      TIER: db-f1-micro
+  # build-and-deploy-on-google:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     REGION: europe-west3
+  #     TIER: db-f1-micro
     
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ssh-key: ${{ secrets.SSH_PRIVATE_KEY_APP }}
-        persist-credentials: true
-        repository: infologistix/petclinic-app-gcp
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     with:
+  #       ssh-key: ${{ secrets.SSH_PRIVATE_KEY_APP }}
+  #       persist-credentials: true
+  #       repository: infologistix/petclinic-app-gcp
 
-    - uses: 'google-github-actions/auth@v2'
-      with:
-        project_id: ${{ secrets.PROJECT_ID }}
-        credentials_json: ${{ secrets.GCLOUD_JSON }}
+  #   - uses: 'google-github-actions/auth@v2'
+  #     with:
+  #       project_id: ${{ secrets.PROJECT_ID }}
+  #       credentials_json: ${{ secrets.GCLOUD_JSON }}
 
-    - name: Create Postgres Server
-      run: |
-        export NAME=postgres-${GITHUB_REF##*/}
-        echo "Create Postgres Instance"
-        gcloud sql instances create $NAME \
-          --database-version=POSTGRES_15 \
-          --region=${{ env.REGION }} \
-          --tier=${{ env.TIER }}  \
-          --edition=ENTERPRISE \
-          --network=vpc-network \
-          --enable-google-private-path
-        echo "Set a user password"
-        gcloud sql users set-password postgres \
-          --instance $NAME \
-          --password=password123
+  #   - name: Create Postgres Server
+  #     run: |
+  #       export NAME=postgres-${GITHUB_REF##*/}
+  #       echo "Create Postgres Instance"
+  #       gcloud sql instances create $NAME \
+  #         --database-version=POSTGRES_15 \
+  #         --region=${{ env.REGION }} \
+  #         --tier=${{ env.TIER }}  \
+  #         --edition=ENTERPRISE \
+  #         --network=vpc-network \
+  #         --enable-google-private-path
+  #       echo "Set a user password"
+  #       gcloud sql users set-password postgres \
+  #         --instance $NAME \
+  #         --password=password123
 
 
   create-namespace:
