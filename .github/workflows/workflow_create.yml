@@ -1,7 +1,6 @@
 name: Create Branch Workflow
 
-on: workflow_dispatch
-#on: create
+on: create
 
 jobs:
 
