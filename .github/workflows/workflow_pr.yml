@@ -13,7 +13,7 @@ jobs:
       USER: infologistix
       DOCKER_USER: palexus
       REGISTRY: ghcr.io
-      VERSION: $(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
+      VERSION: ${GITHUB_REF#refs/heads/}
 
     runs-on: ubuntu-latest
 
