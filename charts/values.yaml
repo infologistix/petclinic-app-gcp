@@ -5,10 +5,10 @@
 replicaCount: 1
 deployment:
   datasource:
-    db_host: 35.246.152.69
+    db_host: 35.246.204.25
     db_port: 5432
     db_name: postgres
-    jdbc_url: jdbc:postgresql://35.246.152.69:5432/postgres
+    jdbc_url: jdbc:postgresql://35.246.204.25:5432/postgres
     #jdbc_url: jdbc:postgresql://postgresql:5432/mydb
     username: postgres
     password: password123
