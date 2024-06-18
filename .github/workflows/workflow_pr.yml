@@ -30,6 +30,8 @@ jobs:
         
     - name: Build with Maven
       run: |
+        echo The Version is ${{ env.VERSION }}
+        echo The Repo is ${{env.REGISTRY}}/$USER/$TAG
         chmod +x mvnw
         ./mvnw -B package --update-snapshots verify
         
