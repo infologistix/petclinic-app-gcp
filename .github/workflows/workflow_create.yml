@@ -105,7 +105,7 @@ jobs:
         echo "another boring line" >> test.txt
         echo "You are on the Branch ${GITHUB_REF##*/}"
         export BRANCH=${GITHUB_REF##*/}
-        export HOST=$(gcloud sql instances describe postgres-$BRANCH | grep ipAddress | tail -1 | awk '{print $NF}')
+        export HOST=$(gcloud sql instances list --filter=name:postgres-$BRANCH --format="value(PRIMARY_ADDRESS)")
         echo the host is $HOST
         export JDBC_URL="jdbc:postgresql://$HOST:5432/postgres"
         export NAMESPACE=$(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
