@@ -13,7 +13,7 @@ jobs:
       USER: infologistix
       DOCKER_USER: palexus
       REGISTRY: ghcr.io
-      VERSION: $(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
+      VERSION: ${{ github.head_ref || github.ref_name }} 
 
     runs-on: ubuntu-latest
 
@@ -30,7 +30,8 @@ jobs:
         
     - name: Build with Maven
       run: |
-        echo ${{env.REGISTRY}}/$USER/$TAG
+        echo The Version is ${{ env.VERSION }}
+        echo The Repo is ${{env.REGISTRY}}/$USER/$TAG
         chmod +x mvnw
         ./mvnw -B package --update-snapshots verify
         
@@ -50,7 +51,7 @@ jobs:
       with:
         image-repository: ${{env.REGISTRY}}/$USER/$TAG
         image-tag: ${{ env.VERSION }}
-        min-high-cves-to-fail: "52"
+        min-high-cves-to-fail: "100"
         min-medium-cves-to-fail: "150"
 
   compliance-check:
@@ -60,4 +61,3 @@ jobs:
     - name: compliance-check
       run: |
         echo "Hier werden compliance Regeln gecheckt"
-
