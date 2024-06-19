@@ -61,4 +61,3 @@ jobs:
     - name: compliance-check
       run: |
         echo "Hier werden compliance Regeln gecheckt"
-
