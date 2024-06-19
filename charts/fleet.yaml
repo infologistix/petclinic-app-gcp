@@ -1,10 +1,10 @@
-defaultNamespace: main
+defaultNamespace: superfeature
 helm:
   repo: https://github.com/infologistix/petclinic-app-gcp.git
-  releaseName: petclinic-main
+  releaseName: petclinic-superfeature
   valuesFiles:
     - charts/values.yaml
 # All resources will be assigned to this namespace and if any cluster scoped
 # resource exists the deployment will fail.
 # Default: ""
-namespace: main
+namespace: superfeature

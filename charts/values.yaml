@@ -5,10 +5,10 @@
 replicaCount: 1
 deployment:
   datasource:
-    db_host: 35.246.204.25
+    db_host: 10.53.0.17
     db_port: 5432
     db_name: postgres
-    jdbc_url: jdbc:postgresql://35.246.204.25:5432/postgres
+    jdbc_url: jdbc:postgresql://10.53.0.17:5432/postgres
     #jdbc_url: jdbc:postgresql://postgresql:5432/mydb
     username: postgres
     password: password123
@@ -17,7 +17,7 @@ deployment:
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     #tag: "1.0.0"
-    tag: "main"
+    tag: "superfeature"
 imagePullSecrets: registry
 nameOverride: ""
 fullnameOverride: ""
