@@ -44,12 +44,12 @@ jobs:
         
     - name: docker build quarkus-petclinic-jvm
       run: |
-        docker build --no-cache -f src/main/docker/Dockerfile.jvm -t ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }} .
+        docker build --no-cache -f src/main/docker/Dockerfile.jvm -t test .
         
     - name: Scan Image
       uses: neuvector/scan-action@main
       with:
-        image-repository: ${{env.REGISTRY}}/$USER/$TAG:${{ env.VERSION }}
+        image-repository: test
         image-tag: latest
         min-high-cves-to-fail: "52"
         min-medium-cves-to-fail: "150"
