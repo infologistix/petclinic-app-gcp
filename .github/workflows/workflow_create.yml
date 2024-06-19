@@ -43,9 +43,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PROJECT_ID: p-ccgs6
-      CLUSTER_ID: c-57vhw
-    
+      PROJECT_ID: p-lcpdc
+      CLUSTER_ID: c-mqkfg
+
     steps:
     - name: Get Kubectl
       uses: tale/kubectl-action@v1
