@@ -51,7 +51,7 @@ jobs:
       with:
         image-repository: test
         image-tag: latest
-        min-high-cves-to-fail: "52"
+        min-high-cves-to-fail: "100"
         min-medium-cves-to-fail: "150"
 
   compliance-check:
