@@ -95,7 +95,7 @@ jobs:
           description: "Cloud Endpoints DNS"
           title: "Cloud Endpoints DNS"
           version: "1.0.0"
-        paths: {}
+        paths: {{ \${} }}
         host: "${RELEASENAME}.endpoints.${PROJECT}.cloud.goog"
         x-google-endpoints:
         - name: "${RELEASENAME}.endpoints.${PROJECT}.cloud.goog"
