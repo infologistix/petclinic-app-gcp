@@ -77,11 +77,6 @@ jobs:
         type: kubernetes.io/dockerconfigjson
         YAML
 
-    - uses: 'google-github-actions/auth@v2'
-      with:
-        project_id: ${{ secrets.PROJECT_ID }}
-        credentials_json: ${{ secrets.GCLOUD_JSON }}
-
     - name: install yq
       run: |
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
@@ -93,6 +88,11 @@ jobs:
         ssh-key: ${{ secrets.SSH_PRIVATE_KEY_APP }}
         persist-credentials: true
         repository: infologistix/petclinic-app-gcp
+
+    - uses: 'google-github-actions/auth@v2'
+      with:
+        project_id: ${{ secrets.PROJECT_ID }}
+        credentials_json: ${{ secrets.GCLOUD_JSON }}
 
     - name: create endpoint
       run: |
