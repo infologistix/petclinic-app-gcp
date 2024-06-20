@@ -42,15 +42,15 @@ spec:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 15
-            periodSeconds: 30
+            initialDelaySeconds: 5
+            periodSeconds: 10
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 15
+            initialDelaySeconds: 5
             periodSeconds: 10
-            failureThreshold: 5
+            failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
