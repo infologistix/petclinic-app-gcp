@@ -82,25 +82,27 @@ jobs:
         project_id: ${{ secrets.PROJECT_ID }}
         credentials_json: ${{ secrets.GCLOUD_JSON }}
 
+    - name: install yq
+      run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+          yq --version
+  
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.SSH_PRIVATE_KEY_APP }}
+        persist-credentials: true
+        repository: infologistix/petclinic-app-gcp
+
     - name: create endpoint
       run: |
         export GCLB_IP=$(gcloud compute addresses describe e2m-gclb-ip --format "value(address)" --global)
-        export RELEASENAME=petclinic-${GITHUB_REF##*/}
-        export PROJECT=${{ secrets.PROJECT_ID }}
+        export HOST=petclinic-${GITHUB_REF##*/}.endpoints.susecon-demo.cloud.goog
+        echo $HOST
         echo $GCLB_IP
-        echo $RELEASENAME
-        cat <<EOF > dns-spec.yaml
-        swagger: "2.0"
-        info:
-          description: "Cloud Endpoints DNS"
-          title: "Cloud Endpoints DNS"
-          version: "1.0.0"
-        paths: {{ \${} }}
-        host: "${RELEASENAME}.endpoints.${PROJECT}.cloud.goog"
-        x-google-endpoints:
-        - name: "${RELEASENAME}.endpoints.${PROJECT}.cloud.goog"
-          target: "${GCLB_IP}"
-        EOF
+        yq -i eval '.host=env(HOST)' dns-spec.yaml
+        yq -i eval '.x-google-endpoints[0].name=env(HOST)' dns-spec.yaml
+        yq -i eval '.x-google-endpoints[0].target=strenv(GCLB_IP)' dns-spec.yaml
         cat dns-spec.yaml
         gcloud endpoints services deploy dns-spec.yaml
           
