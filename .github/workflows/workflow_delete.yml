@@ -60,7 +60,7 @@ jobs:
           --project=${{ secrets.PROJECTS_ID }}
 
 
-  Remove_Namespace:
+  Remove_Namespace_and_Endpoint:
     runs-on: ubuntu-latest
     needs: [Update_fleet_repo]
     
@@ -78,3 +78,8 @@ jobs:
           else 
             echo "Namespace does not exist" 
           fi
+
+    - name: Delete Endpoint
+      run: |
+        export NAMESPACE=$(echo ${{ github.event.ref }} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g')
+        gcloud endpoints services delete petclinic-${NAMESPACE}.endpoints.susecon-demo.cloud.goog

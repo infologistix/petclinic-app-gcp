@@ -39,7 +39,7 @@ jobs:
           --password=password123
 
 
-  create-namespace:
+  create-namespace-and-endpoint:
     runs-on: ubuntu-latest
 
     env:
@@ -56,31 +56,56 @@ jobs:
       run: |
         echo NAMESPACE=$(echo ${GITHUB_REF##*/} | sed -e s/[\/_]/-/g | sed -e 's/\(.*\)/\L\1/g') >> $GITHUB_ENV
         
-    - name: Create Namespace
+    - name: create namespace
       run: |
-          if kubectl get namespace ${{ env.NAMESPACE }} &> /dev/null; then 
-            echo "Namespace already exists" 
-          else 
-            kubectl create namespace ${{ env.NAMESPACE }}
-            kubectl label namespaces ${{ env.NAMESPACE }} istio-injection=enabled --overwrite=true
-            kubectl label namespaces ${{ env.NAMESPACE }} field.cattle.io/projectId=${{ env.PROJECT_ID }} --overwrite=true
-            kubectl annotate namespaces ${{ env.NAMESPACE }} field.cattle.io/projectId=${{ env.CLUSTER_ID }}:${{ env.PROJECT_ID }}
-          fi
-          cat <<'YAML' | kubectl apply -f -
-          apiVersion: v1
-          data:
-            .dockerconfigjson: ${{ secrets.REGISTRYSECRET }}
-          kind: Secret
-          metadata:
-            name: registry
-            namespace: ${{ env.NAMESPACE }}
-          type: kubernetes.io/dockerconfigjson
-          YAML
+        if kubectl get namespace ${{ env.NAMESPACE }} &> /dev/null; then 
+          echo "Namespace already exists" 
+        else 
+          kubectl create namespace ${{ env.NAMESPACE }}
+          kubectl label namespaces ${{ env.NAMESPACE }} istio-injection=enabled --overwrite=true
+          kubectl label namespaces ${{ env.NAMESPACE }} field.cattle.io/projectId=${{ env.PROJECT_ID }} --overwrite=true
+          kubectl annotate namespaces ${{ env.NAMESPACE }} field.cattle.io/projectId=${{ env.CLUSTER_ID }}:${{ env.PROJECT_ID }}
+        fi          
+        cat <<'YAML' | kubectl apply -f -
+        apiVersion: v1
+        data:
+          .dockerconfigjson: ${{ secrets.REGISTRYSECRET }}
+        kind: Secret
+        metadata:
+          name: registry            
+          namespace: ${{ env.NAMESPACE }}
+        type: kubernetes.io/dockerconfigjson
+        YAML
 
+    - uses: 'google-github-actions/auth@v2'
+      with:
+        project_id: ${{ secrets.PROJECT_ID }}
+        credentials_json: ${{ secrets.GCLOUD_JSON }}
+
+    - name: create endpoint
+      run: |
+        export GCLB_IP=$(gcloud compute addresses describe e2m-gclb-ip --format "value(address)" --global)
+        export RELEASENAME=petclinic-${GITHUB_REF##*/}
+        export PROJECT=${{ secrets.PROJECT_ID }}
+        echo $GCLB_IP
+        echo $RELEASENAME
+        cat <<EOF > dns-spec.yaml
+        swagger: "2.0"
+        info:
+          description: "Cloud Endpoints DNS"
+          title: "Cloud Endpoints DNS"
+          version: "1.0.0"
+        paths: {}
+        host: "${RELEASENAME}.endpoints.${PROJECT}.cloud.goog"
+        x-google-endpoints:
+        - name: "${RELEASENAME}.endpoints.${PROJECT}.cloud.goog"
+          target: "${GCLB_IP}"
+        EOF
+        gcloud endpoints services deploy dns-spec.yaml
           
   checkout-update-app:
     runs-on: ubuntu-latest
-    needs: [create-namespace, build-and-deploy-on-google]
+    needs: [create-namespace-and-endpoint, build-and-deploy-on-google]
     steps:
     - name: install yq
       run: |
