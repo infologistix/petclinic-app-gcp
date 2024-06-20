@@ -101,6 +101,7 @@ jobs:
         - name: "${RELEASENAME}.endpoints.${PROJECT}.cloud.goog"
           target: "${GCLB_IP}"
         EOF
+        cat dns-spec.yaml
         gcloud endpoints services deploy dns-spec.yaml
           
   checkout-update-app:
